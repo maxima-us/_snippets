@@ -1,3 +1,4 @@
+from abc import abstractmethod
 import typing
 
 
@@ -41,7 +42,7 @@ run_aw(increment, 1)
 
 class Incrementable(typing.Protocol):
 
-
+    @abstractmethod     #==> decorator forces all child classes to declare an increment method
     def increment(self) -> None:
         ...
 
@@ -57,13 +58,27 @@ class Gear(Incrementable):
         self.current_gear += 1
 
 
+class Votes(Incrementable):
+
+    def __init__(self, current_votes: int):
+        self.votes = current_votes
+
+    # will throw an error ONLY IF Incrementable.increment was decorated as an abstractmethod
+
+
 # pylang and mypy will recognize that gear has the increment method 
-def shift_gear(gear: Incrementable):
+def shift_gear(gear: Gear):
     gear.increment()
 
 # pylang and mypy will throw errors here
 def shift_up(gear: int):
     gear.increment()
+
+
+def cast_vote(votes: Votes):
+    votes.increment()
+
+cast_vote(Votes(10))
 
 
 
@@ -159,12 +174,3 @@ try:
 
 except pydantic.ValidationError as e:
     raise 
-
-
-
-
-text = ""
-
-def print_sthg(input: str) -> typing.NoReturn:
-    global text
-    text = input
